@@ -1,32 +1,17 @@
 import ctypes
+import os 
 import sys 
-from pathlib import Path
 from PySide6 import QtCore, QtWidgets, QtGui
 Qt = QtCore.Qt
 
-def _load_dsp():
-    if sys.platform.startswith('win'):
-        lib_name = 'dsp.dll'
-    elif sys.platform.startswith('darwin'):
-        lib_name = 'libdsp.dylib'
-    else:
-        lib_name = 'libdsp.so'
-
-    if getattr(sys, 'frozen', False):
-        candidates = [Path(sys._MEIPASS) / lib_name]
-    else:
-        root = Path(__file__).resolve().parent
-        candidates = [
-            root / 'zig-out' / 'lib' / lib_name,
-            root / 'zig-out' / 'bin' / lib_name,
-        ]
-    
-    for path in candidates:
-        if path.exists():
-            return ctypes.CDLL(str(path))
-    raise FileNotFoundError(f'{lib_name} not found in {[str(c) for c in candidates]}')
-
-dsp = _load_dsp()
+# load the dsp
+dir_path = os.path.dirname(os.path.realpath(__file__))
+if sys.platform.startswith("win"): 
+	dsp = ctypes.CDLL(os.path.join(dir_path, 'zig-out', 'lib', 'dsp.dll'))
+elif sys.platform.startswith("darwin"): 
+	dsp = ctypes.CDLL(os.path.join(dir_path, 'zig-out', 'lib', 'libdsp.dylib'))
+else: 
+	dsp = ctypes.CDLL(os.path.join(dir_path, 'zig-out', 'lib', 'libdsp.so'))
 
 # data types zig expects
 # not all of these are needed to be stated..

@@ -7,7 +7,7 @@ pub fn build(b: *std.Build) void {
     const c_translation = b.addTranslateC(.{
         .root_source_file = b.path("miniaudio.h"),
         .target = target,
-        .link_libc = true,
+        .optimize = optimize,
     });
 
     const dsp_module = b.createModule(.{
@@ -24,28 +24,27 @@ pub fn build(b: *std.Build) void {
         .flags = &[_][]const u8{ "-std=c99" }, // Force C99 standard
     });
 
+    // link the platform audio backend for miniaudio
+    switch (target.result.os.tag) {
+            .macos => {
+                dsp_module.linkFramework("CoreFoundation", .{});
+                dsp_module.linkFramework("CoreAudio", .{});
+                dsp_module.linkFramework("AudioToolbox", .{});
+            },
+            .windows => {
+                dsp_module.linkSystemLibrary("ole32", .{});
+                dsp_module.linkSystemLibrary("user32", .{});
+                dsp_module.linkSystemLibrary("winmm", .{});
+            },
+            else => {},
+      }
+
     // Create a shared library
     const lib = b.addLibrary(.{
         .name = "dsp",
         .linkage = .dynamic,
         .root_module = dsp_module 
     });
-
-    switch (target.result.os.tag) {
-        .macos => {
-            dsp_module.linkFramework("CoreFoundation", .{});
-            dsp_module.linkFramework("CoreAudio", .{});
-            dsp_module.linkFramework("AudioToolbox", .{});
-            // if the linker complains about AudioToolbox, add:
-            // dsp_module.linkFramework("AudioUnit");
-        },
-        .windows => {
-            dsp_module.linkSystemLibrary("ole32", .{});
-            dsp_module.linkSystemLibrary("user32", .{});
-            dsp_module.linkSystemLibrary("winmm", .{});
-        },
-        else => {}, // Linux: miniaudio dlopens ALSA/Pulse at runtime, libc is enough.
-    }
 
     // Output the final compiled library into the project folder
     b.installArtifact(lib);

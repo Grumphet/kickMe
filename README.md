@@ -18,6 +18,26 @@ to create a wide range of kick flavours.
 Although the original idea I had was to create this a sound design tool that is then re-sampled into the DAW/sampler being used for the actual composition, a 16 step sequencer with active step controls was added as it vastly improves the enjoyment of 
 the sound design.
 
+### How to run:
+
+Using Zig 0.17.0-dev and Python 3
+
+*clone repo*
+
+`git clone https://github.com/Grumphet/kickMe.git`
+`cd kickMe`
+
+*install pyside6*
+`pip install PySide6`
+
+*build the dsp*
+`zig build`
+
+run the gui
+`python gui.py`
+
+*have fun!*
+
 ### Key Components
 
 #### Back-end: DSP built in Zig
