@@ -33,10 +33,8 @@ Using Zig 0.17.0-dev and Python 3
 *build the dsp*
 `zig build`
 
-run the gui
+*run the gui*
 `python gui.py`
-
-*have fun!*
 
 ### Key Components
 
