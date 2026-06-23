@@ -31,6 +31,25 @@ pub fn build(b: *std.Build) void {
         .root_module = dsp_module 
     });
 
+    lib.linkLibC();
+
+    switch (target.result.os.tag) {
+        .macos => {
+            lib.linkFramework("CoreFoundation");
+            lib.linkFramework("CoreAudio");
+            lib.linkFramework("AudioToolbox");
+            // if the linker complains about AudioToolbox, add:
+            // lib.linkFramework("AudioUnit");
+        },
+        .windows => {
+            lib.linkSystemLibrary("ole32");
+            lib.linkSystemLibrary("user32");
+            lib.linkSystemLibrary("winmm");
+        },
+        else => {
+            // Linux: miniaudio dlopens ALSA/Pulse at runtime, libc is enough.
+        },
+    }
     // Output the final compiled library into the project folder
     b.installArtifact(lib);
 }
