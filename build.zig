@@ -7,7 +7,6 @@ pub fn build(b: *std.Build) void {
     const c_translation = b.addTranslateC(.{
         .root_source_file = b.path("miniaudio.h"),
         .target = target,
-        .optimize = optimize,
         .link_libc = true,
     });
 
