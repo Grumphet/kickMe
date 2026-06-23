@@ -34,16 +34,16 @@ pub fn build(b: *std.Build) void {
 
     switch (target.result.os.tag) {
         .macos => {
-            dsp_module.linkFramework("CoreFoundation");
-            dsp_module.linkFramework("CoreAudio");
-            dsp_module.linkFramework("AudioToolbox");
+            dsp_module.linkFramework("CoreFoundation", .{});
+            dsp_module.linkFramework("CoreAudio", .{});
+            dsp_module.linkFramework("AudioToolbox", .{});
             // if the linker complains about AudioToolbox, add:
             // dsp_module.linkFramework("AudioUnit");
         },
         .windows => {
-            dsp_module.linkSystemLibrary("ole32");
-            dsp_module.linkSystemLibrary("user32");
-            dsp_module.linkSystemLibrary("winmm");
+            dsp_module.linkSystemLibrary("ole32", .{});
+            dsp_module.linkSystemLibrary("user32", .{});
+            dsp_module.linkSystemLibrary("winmm", .{});
         },
         else => {}, // Linux: miniaudio dlopens ALSA/Pulse at runtime, libc is enough.
     }
