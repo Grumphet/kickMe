@@ -1,0 +1,14 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+
+# Zig build artifacts
+.zig-cache/
+zig-out/
+
+# OS-specific clutter
+.DS_Store
+Thumbs.db
