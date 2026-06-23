@@ -2,18 +2,17 @@
 
 ## A digital kick drum synthesizer
 
-### Video Demo: <URL>
+### Video Demo: https://youtu.be/TTV3M8obspA
 
 ### Description
 
-The initial goal for KickPlayground was to try and digitally recreate some of the magic from one of my favorite synthesizers:
-the Korg Volca Kick
+The initial idea for kickMe was to try and digitally recreate a tool that captures some of the magic from one of my favorite 
+synthesizers: the Korg Volca Kick.
 
-The Volca Kick uses a reproduction of the classic (rev1) MS-20 filter. This filter self-resonating is the core.
-oscillator for the kick drum.
+This synth takes a 'mixed-coast' design with a modelled Moog-style ladder filter used as both an oscillator (in a self-resonant 
+mode) and as a traditional filter. The oscillator is then harmonically enriched with a modelled Buchla 259 wavefolder and drive for saturation.
 
-This self-resonant filter then has a pitch envelope applied to create lovely, snappy kicks. A few coloring options are then used
-to create a wide range of kick flavours.
+This wave then has a pitch envelope applied to create lovely, snappy kicks.
 
 Although the original idea I had was to create this a sound design tool that is then re-sampled into the DAW/sampler being used for the actual composition, a 16 step sequencer with active step controls was added as it vastly improves the enjoyment of 
 the sound design.
@@ -25,6 +24,7 @@ Using Zig 0.17.0-dev and Python 3
 *clone repo*
 
 `git clone https://github.com/Grumphet/kickMe.git`
+
 `cd kickMe`
 
 *install pyside6*
