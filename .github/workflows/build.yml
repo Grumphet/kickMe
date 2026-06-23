@@ -34,12 +34,6 @@ jobs:
         with:
           version: 0.17.0-dev.644+3de725074 # if it breaks, it's probably this
                                             # update to a newer version and pin to 0.17 when released stable
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
