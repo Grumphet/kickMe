@@ -27,11 +27,10 @@ const FoldPos = enum(u8) {
     post = 1,
 };
 
-// adjustments for self filter osc
+// adjustments for filter osc
 const OSC_GAIN: f32 = 12.0;
 const OSC_TUNE: f32 = 1.02;
 
-// global variables that the Py GUI will change via ctypes
 const Kick = struct {
     sample_rate: f32 = 44100.0,
     phase: f32 = 0.0,
@@ -284,22 +283,6 @@ var synth: Kick = .{};
 var device: c.ma_device = undefined;
 const StartError  = error{ DeviceInitFailed, DeviceStartFailed };
 
-// error handling
-fn openDevice() StartError!void {
-    var config = c.ma_device_config_init(c.ma_device_type_playback);
-    config.playback.format = c.ma_format_f32;
-    config.playback.channels = 2;
-    config.sampleRate = 44100;
-    config.dataCallback = audioCallback;
-
-    if (c.ma_device_init(null, &config, &device) != c.MA_SUCCESS)
-        return error.DeviceInitFailed;
-    if (c.ma_device_start(&device) != c.MA_SUCCESS) {
-        c.ma_device_uninit(&device);
-        return error.DeviceStartFailed;
-    }
-}
-
 // miniaudio is used for this output pipe
 fn audioCallback(pDevice: [*c]c.ma_device, pOutput: ?*anyopaque, pInput: ?*const anyopaque, frameCount: c.ma_uint32) callconv(.c) void {
     _ = pInput;
@@ -307,16 +290,32 @@ fn audioCallback(pDevice: [*c]c.ma_device, pOutput: ?*anyopaque, pInput: ?*const
     // read the device's real sample rate
     synth.sample_rate = @as(f32, @floatFromInt(pDevice.*.sampleRate));
     synth.updateCoefs();
-    synth.osc_filter.sample_rate = synth.sample_rate;   // per-sample cutoff for osc filter
-    synth.post_filter.setSampleRate(synth.sample_rate); // stable cutoff for post filter
+    synth.osc_filter.sample_rate = synth.sample_rate;                           // per-sample cutoff for osc filter
+    synth.post_filter.setSampleRate(synth.sample_rate);                         // stable cutoff for post filter
 
-    var output = @as([*]f32, @ptrCast(@alignCast(pOutput)))[0 .. frameCount * 2]; // * 2 for Stereo
-
+    var output = @as([*]f32, @ptrCast(@alignCast(pOutput)))[0 .. frameCount * 2];
+                                                                                // * 2 for stereo
     var i: usize = 0;
     while (i < output.len) : (i += 2) {
         const sample = synth.nextSample();
-        output[i] = sample;                             // left
-        output[i + 1] = sample;                         // right
+        output[i] = sample;                                                     // left
+        output[i + 1] = sample;                                                 // right
+    }
+}
+
+fn openDevice() StartError!void {
+    var config = c.ma_device_config_init(c.ma_device_type_playback);
+    config.playback.format = c.ma_format_f32;
+    config.playback.channels = 2;
+    config.sampleRate = 44100;
+    config.dataCallback = audioCallback;
+
+    // error handling
+    if (c.ma_device_init(null, &config, &device) != c.MA_SUCCESS)
+        return error.DeviceInitFailed;
+    if (c.ma_device_start(&device) != c.MA_SUCCESS) {
+        c.ma_device_uninit(&device);
+        return error.DeviceStartFailed;
     }
 }
 
